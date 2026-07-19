@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proctor Ledger — Interview Assessments</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#12151a;
+    --panel:#1b1f27;
+    --panel-2:#21262f;
+    --border:#2c323c;
+    --text:#e7e9ec;
+    --muted:#8992a0;
+    --amber:#e8a33d;
+    --cyan:#4fb8c4;
+    --danger:#e05a5a;
+    --good:#5cc98a;
+    --mono:'JetBrains Mono', ui-monospace, monospace;
+    --sans:'Inter', system-ui, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;-webkit-font-smoothing:antialiased;}
+  #app{min-height:100vh;display:flex;flex-direction:column;}
+  a{color:inherit;}
+  button{font-family:var(--sans);cursor:pointer;}
+  input,textarea,select{font-family:var(--sans);}
+  ::selection{background:var(--cyan);color:#0b0d10;}
+
+  .topbar{display:flex;align-items:center;justify-content:space-between;padding:16px 28px;border-bottom:1px solid var(--border);background:linear-gradient(180deg,#151920,#12151a);position:sticky;top:0;z-index:20;}
+  .brand{display:flex;align-items:center;gap:10px;cursor:pointer;}
+  .brand-mark{width:26px;height:26px;border-radius:4px;background:var(--amber);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-weight:700;color:#12151a;font-size:13px;}
+  .brand-name{font-family:var(--mono);font-weight:600;letter-spacing:0.02em;font-size:15px;}
+  .brand-sub{color:var(--muted);font-size:11px;font-family:var(--mono);}
+  .topbar-right{display:flex;gap:10px;align-items:center;}
+
+  .btn{border:1px solid var(--border);background:var(--panel-2);color:var(--text);padding:9px 16px;border-radius:6px;font-size:13.5px;font-weight:500;transition:border-color .15s, background .15s; display:inline-flex; align-items:center; gap:6px;}
+  .btn:hover{border-color:#454e5c;}
+  .btn-primary{background:var(--cyan);border-color:var(--cyan);color:#0b1416;font-weight:600;}
+  .btn-primary:hover{background:#63c6d1;}
+  .btn-amber{background:var(--amber);border-color:var(--amber);color:#231603;font-weight:600;}
+  .btn-amber:hover{background:#f0b458;}
+  .btn-danger{background:transparent;border-color:var(--danger);color:var(--danger);}
+  .btn-danger:hover{background:rgba(224,90,90,0.1);}
+  .btn-ghost{background:transparent;border-color:transparent;color:var(--muted);}
+  .btn-ghost:hover{color:var(--text);}
+  .btn-sm{padding:6px 11px;font-size:12.5px;border-radius:5px;}
+  .btn[disabled]{opacity:0.45;cursor:not-allowed;}
+
+  .wrap{max-width:1080px;margin:0 auto;padding:36px 28px 80px;width:100%;flex:1;}
+  .wrap-narrow{max-width:640px;}
+  h1.page-title{font-family:var(--mono);font-size:22px;margin:0 0 4px;}
+  p.page-sub{color:var(--muted);font-size:14px;margin:0 0 28px;}
+  .eyebrow{font-family:var(--mono);color:var(--amber);font-size:11px;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:8px;}
+
+  .home-hero{padding:60px 28px 20px;text-align:center;}
+  .home-hero h1{font-family:var(--mono);font-size:34px;margin:0 0 10px;letter-spacing:-0.01em;}
+  .home-hero p{color:var(--muted);font-size:15px;max-width:520px;margin:0 auto;}
+  .mode-cards{display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:760px;margin:44px auto 0;padding:0 28px;}
+  @media (max-width:640px){.mode-cards{grid-template-columns:1fr;}}
+  .mode-card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:28px;text-align:left;transition:border-color .15s, transform .15s;}
+  .mode-card:hover{border-color:var(--cyan);transform:translateY(-2px);}
+  .mode-card .icon{font-family:var(--mono);font-size:20px;color:var(--amber);margin-bottom:14px;}
+  .mode-card h3{margin:0 0 8px;font-size:17px;}
+  .mode-card p{color:var(--muted);font-size:13.5px;line-height:1.5;margin:0 0 18px;}
+
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:22px;}
+  .card + .card{margin-top:14px;}
+  .row{display:flex;gap:10px;align-items:center;}
+  .row-between{display:flex;justify-content:space-between;align-items:center;}
+  .field{margin-bottom:16px;}
+  .field label{display:block;font-size:12.5px;color:var(--muted);margin-bottom:6px;font-family:var(--mono);}
+  .field input[type=text], .field input[type=email], .field input[type=number], .field textarea, .field select{width:100%;background:var(--panel-2);border:1px solid var(--border);color:var(--text);padding:10px 12px;border-radius:6px;font-size:14px;outline:none;}
+  .field input:focus, .field textarea:focus, .field select:focus{border-color:var(--cyan);}
+  .field textarea{resize:vertical;min-height:70px;}
+  .hint{font-size:11.5px;color:var(--muted);margin-top:5px;}
+
+  .assessment-row{display:flex;justify-content:space-between;align-items:center;padding:16px 18px;background:var(--panel);border:1px solid var(--border);border-radius:8px;cursor:pointer;}
+  .assessment-row:hover{border-color:var(--cyan);}
+  .assessment-row + .assessment-row{margin-top:10px;}
+  .empty-state{padding:50px 20px;text-align:center;color:var(--muted);border:1px dashed var(--border);border-radius:10px;}
+
+  .qcard{background:var(--panel-2);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:12px;}
+  .qcard .qhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+  .qtype-badge{font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:0.08em;padding:3px 8px;border-radius:4px;}
+  .qtype-mcq{background:rgba(79,184,196,0.15);color:var(--cyan);}
+  .qtype-text{background:rgba(232,163,61,0.15);color:var(--amber);}
+  .qtype-coding{background:rgba(92,201,138,0.15);color:var(--good);}
+  .opt-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+  .opt-row input[type=text]{flex:1;}
+  .add-q-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;}
+
+  .share-box{background:linear-gradient(180deg,#20261f,#1b1f27);border:1px solid #3a4d38;border-radius:8px;padding:16px 18px;margin-bottom:18px;}
+  .share-box .label{font-size:11px;color:var(--muted);font-family:var(--mono);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px;}
+  .share-link{font-family:var(--mono);font-size:12px;color:var(--good);background:var(--panel-2);border:1px solid var(--border);border-radius:6px;padding:10px 12px;word-break:break-all;margin-bottom:10px;}
+  .share-actions{display:flex;gap:8px;flex-wrap:wrap;}
+
+  .decode-box textarea{font-family:var(--mono);font-size:12px;min-height:90px;}
+
+  .exam-shell{display:flex;flex-direction:column;min-height:100vh;}
+  .exam-header{padding:14px 26px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;background:#151920;position:sticky;top:0;z-index:15;}
+  .exam-title{font-family:var(--mono);font-size:14.5px;}
+  .exam-progress{color:var(--muted);font-size:12.5px;font-family:var(--mono);}
+  .timer{font-family:var(--mono);font-size:15px;padding:5px 12px;border-radius:6px;border:1px solid var(--border);background:var(--panel-2);}
+  .timer.low{color:var(--danger);border-color:var(--danger);}
+  .exam-body{flex:1;max-width:760px;margin:0 auto;padding:40px 26px 140px;width:100%;}
+  .qnav{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:26px;}
+  .qnav-dot{width:30px;height:30px;border-radius:6px;border:1px solid var(--border);background:var(--panel-2);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:12px;color:var(--muted);cursor:pointer;}
+  .qnav-dot.active{border-color:var(--cyan);color:var(--cyan);}
+  .qnav-dot.answered{color:var(--good);border-color:#33513f;}
+  .q-text{font-size:17px;line-height:1.6;margin-bottom:20px;white-space:pre-wrap;}
+  .mcq-opt{display:flex;align-items:center;gap:12px;padding:13px 16px;border:1px solid var(--border);border-radius:8px;margin-bottom:10px;cursor:pointer;transition:border-color .15s, background .15s;}
+  .mcq-opt:hover{border-color:var(--cyan);}
+  .mcq-opt.selected{border-color:var(--cyan);background:rgba(79,184,196,0.08);}
+  .mcq-opt input{accent-color:var(--cyan);}
+  .code-editor{width:100%;min-height:260px;background:#0e1013;border:1px solid var(--border);color:#d8e6d0;font-family:var(--mono);font-size:13.5px;line-height:1.6;padding:16px;border-radius:8px;resize:vertical;outline:none;}
+  .code-editor:focus{border-color:var(--good);}
+  .essay-editor{min-height:180px;}
+  .exam-nav-buttons{display:flex;justify-content:space-between;margin-top:26px;}
+
+  .ticker{position:fixed;bottom:0;left:0;right:0;background:#0d0f13;border-top:1px solid var(--border);padding:10px 22px;display:flex;align-items:center;gap:14px;z-index:20;}
+  .rec-dot{width:8px;height:8px;border-radius:50%;background:var(--danger);animation:pulse 1.4s infinite;flex-shrink:0;}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.25;}}
+  .ticker-label{font-family:var(--mono);font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;flex-shrink:0;}
+  .ticker-scroll{flex:1;overflow:hidden;white-space:nowrap;position:relative;height:16px;}
+  .ticker-entries{font-family:var(--mono);font-size:12px;color:var(--muted);display:flex;gap:26px;}
+  .ticker-entries .flag{color:var(--amber);}
+  .ticker-count{font-family:var(--mono);font-size:11.5px;color:var(--muted);flex-shrink:0;}
+
+  .log-line{font-family:var(--mono);font-size:12.5px;padding:7px 10px;border-bottom:1px solid var(--border);color:var(--muted);display:flex;gap:14px;}
+  .log-line:last-child{border-bottom:none;}
+  .log-line .t{color:#616a76;width:74px;flex-shrink:0;}
+  .log-line .flag{color:var(--amber);}
+  .answer-block{padding:16px 0;border-bottom:1px solid var(--border);}
+  .answer-block:last-child{border-bottom:none;}
+  .answer-block .qtext{font-weight:600;margin-bottom:10px;font-size:14.5px;}
+  .answer-block .ans{background:var(--panel-2);border:1px solid var(--border);border-radius:6px;padding:12px 14px;font-size:13.5px;white-space:pre-wrap;font-family:var(--mono);}
+  .score-pill{font-family:var(--mono);font-size:12px;padding:3px 10px;border-radius:20px;}
+  .score-good{background:rgba(92,201,138,0.15);color:var(--good);}
+  .score-bad{background:rgba(224,90,90,0.15);color:var(--danger);}
+
+  .result-code{font-family:var(--mono);font-size:11.5px;color:var(--text);background:#0e1013;border:1px solid var(--border);border-radius:8px;padding:14px;word-break:break-all;max-height:160px;overflow:auto;margin-bottom:14px;}
+  .center-note{text-align:center;padding:80px 20px;color:var(--muted);}
+  .toast{position:fixed;bottom:26px;right:26px;background:var(--panel-2);border:1px solid var(--good);color:var(--good);padding:10px 16px;border-radius:7px;font-size:13px;font-family:var(--mono);z-index:50;max-width:340px;}
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+/* ---------------- local persistence (admin's own browser only) ---------------- */
+const LS_ASSESSMENTS = 'pl_assessments';       // { id: assessmentObj }
+const LS_ASSESSMENT_ORDER = 'pl_assessment_order'; // [id,...]
+function lsGet(key, fallback){ try{ const raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : fallback; }catch(e){ return fallback; } }
+function lsSet(key, val){ try{ localStorage.setItem(key, JSON.stringify(val)); return true; }catch(e){ return false; } }
+function subKey(assessmentId){ return 'pl_subs_'+assessmentId; }
+
+/* ---------------- encode/decode payloads for links & codes ---------------- */
+function encodeData(obj){
+  try{ return btoa(unescape(encodeURIComponent(JSON.stringify(obj)))); }catch(e){ return null; }
+}
+function decodeData(str){
+  try{ return JSON.parse(decodeURIComponent(escape(atob(str.trim())))); }catch(e){ return null; }
+}
+
+function uid(){ return Math.random().toString(36).slice(2,10) + Date.now().toString(36).slice(-4); }
+function fmtTime(ts){ const d = new Date(ts); return d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'}); }
+function fmtDate(ts){ const d = new Date(ts); return d.toLocaleDateString([], {month:'short',day:'numeric'}) + ' ' + fmtTime(ts); }
+function esc(s){ const d=document.createElement('div'); d.innerText = s==null?'':String(s); return d.innerHTML; }
+
+/* ---------------- app state ---------------- */
+let state = {
+  view: 'home',
+  currentAssessment: null,   // full assessment object being edited or taken
+  candidate: { name:'', email:'' },
+  exam: null,
+  decodedSubmission: null,
+  resultCode: null,
+  toast: null
+};
+
+const app = document.getElementById('app');
+function showToast(msg){ state.toast = msg; render(); setTimeout(()=>{ state.toast=null; render(); }, 2600); }
+function goto(view, opts={}){ Object.assign(state, opts); state.view = view; render(); }
+
+/* ---------------- init: check URL for an embedded assessment ---------------- */
+(function initFromUrl(){
+  const params = new URLSearchParams(window.location.search);
+  const a = params.get('a');
+  if(a){
+    const decoded = decodeData(a);
+    if(decoded && decoded.questions){
+      state.currentAssessment = decoded;
+      state.view = 'candidate-entry';
+    }
+  }
+})();
+
+/* ================= RENDER ROOT ================= */
+function render(){
+  app.innerHTML = '';
+  if(state.view !== 'candidate-exam') app.appendChild(renderTopbar());
+  let body;
+  switch(state.view){
+    case 'home': body = renderHome(); break;
+    case 'admin-dashboard': body = renderAdminDashboard(); break;
+    case 'admin-editor': body = renderAdminEditor(); break;
+    case 'admin-submissions': body = renderAdminSubmissionsList(); break;
+    case 'admin-submission-detail': body = renderSubmissionDetail(state.decodedSubmission, true); break;
+    case 'candidate-entry': body = renderCandidateEntry(); break;
+    case 'candidate-exam': body = renderCandidateExam(); break;
+    case 'candidate-submitted': body = renderCandidateSubmitted(); break;
+    default: body = renderHome();
+  }
+  app.appendChild(body);
+  if(state.toast){ const t=document.createElement('div'); t.className='toast'; t.innerText=state.toast; app.appendChild(t); }
+}
+
+function renderTopbar(){
+  const bar = document.createElement('div');
+  bar.className = 'topbar';
+  bar.innerHTML = `
+    <div class="brand" id="brand-home">
+      <div class="brand-mark">PL</div>
+      <div><div class="brand-name">Proctor Ledger</div><div class="brand-sub">interview assessments</div></div>
+    </div>
+    <div class="topbar-right">${state.view.startsWith('admin') ? `<button class="btn btn-sm" id="nav-dashboard">All assessments</button>` : ''}</div>
+  `;
+  bar.querySelector('#brand-home').onclick = ()=> goto('home');
+  const nd = bar.querySelector('#nav-dashboard');
+  if(nd) nd.onclick = ()=> goto('admin-dashboard');
+  return bar;
+}
+
+/* ================= HOME ================= */
+function renderHome(){
+  const wrap = document.createElement('div');
+  wrap.innerHTML = `
+    <div class="home-hero">
+      <h1>Send the questions. Read the record.</h1>
+      <p>Build an assessment, share one link, and see exactly what happened while it was answered — every tab switch and paste, timestamped. No accounts, nothing to host but this page.</p>
+    </div>
+    <div class="mode-cards">
+      <div class="mode-card" id="card-admin">
+        <div class="icon">▤</div>
+        <h3>I'm running the interview</h3>
+        <p>Write questions — multiple choice, written, or coding — and get a link to send the candidate.</p>
+        <button class="btn btn-primary" id="btn-admin">Open assessment builder</button>
+      </div>
+      <div class="mode-card" id="card-candidate">
+        <div class="icon">◈</div>
+        <h3>I'm the candidate</h3>
+        <p>Paste the code you were given if the link didn't come through directly.</p>
+        <button class="btn btn-amber" id="btn-candidate">Enter with a code</button>
+      </div>
+    </div>
+  `;
+  wrap.querySelector('#btn-admin').onclick = ()=> goto('admin-dashboard');
+  wrap.querySelector('#card-admin').onclick = ()=> goto('admin-dashboard');
+  wrap.querySelector('#btn-candidate').onclick = ()=> goto('candidate-entry', { currentAssessment:null });
+  wrap.querySelector('#card-candidate').onclick = ()=> goto('candidate-entry', { currentAssessment:null });
+  return wrap;
+}
+
+/* ================= ADMIN: DASHBOARD ================= */
+function renderAdminDashboard(){
+  const wrap = document.createElement('div');
+  wrap.className = 'wrap';
+  const assessments = lsGet(LS_ASSESSMENTS, {});
+  const order = lsGet(LS_ASSESSMENT_ORDER, []);
+
+  wrap.innerHTML = `
+    <div class="row-between" style="margin-bottom:26px;">
+      <div>
+        <h1 class="page-title">Your assessments</h1>
+        <p class="page-sub" style="margin:0;">Saved in this browser only. The link you share carries the full assessment, so anyone with it can open and answer it.</p>
+      </div>
+      <button class="btn btn-primary" id="btn-new">+ New assessment</button>
+    </div>
+    <div id="list"></div>
+    <div class="card" style="margin-top:22px;">
+      <div class="eyebrow">Decode a submission</div>
+      <p class="hint" style="margin:0 0 10px;">Paste the result code a candidate sent you.</p>
+      <div class="decode-box">
+        <textarea id="decode-input" placeholder="Paste result code here…"></textarea>
+      </div>
+      <button class="btn btn-sm" id="btn-decode" style="margin-top:10px;">Decode</button>
+      <div id="decode-err" class="hint" style="color:var(--danger);display:none;margin-top:8px;"></div>
+    </div>
+  `;
+
+  wrap.querySelector('#btn-new').onclick = ()=>{
+    const a = { id:uid(), title:'', description:'', durationMinutes:0, questions:[], createdAt: Date.now() };
+    goto('admin-editor', { currentAssessment:a });
+  };
+
+  const listEl = wrap.querySelector('#list');
+  if(order.length===0){
+    listEl.innerHTML = `<div class="empty-state">No assessments yet — create one to get a shareable link.</div>`;
+  } else {
+    order.slice().reverse().forEach(id=>{
+      const a = assessments[id];
+      if(!a) return;
+      const subCount = lsGet(subKey(a.id), []).length;
+      const row = document.createElement('div');
+      row.className = 'assessment-row';
+      row.innerHTML = `
+        <div>
+          <div style="font-weight:600;margin-bottom:4px;">${esc(a.title || 'Untitled assessment')}</div>
+          <div style="color:var(--muted);font-size:12.5px;">${a.questions.length} questions · created ${fmtDate(a.createdAt)} · ${subCount} saved submission${subCount===1?'':'s'}</div>
+        </div>
+        <div class="row"><button class="btn btn-sm" data-view-subs>Submissions</button></div>
+      `;
+      row.onclick = ()=> goto('admin-editor', { currentAssessment: JSON.parse(JSON.stringify(a)) });
+      row.querySelector('[data-view-subs]').onclick = (e)=>{ e.stopPropagation(); goto('admin-submissions', { currentAssessment:a }); };
+      listEl.appendChild(row);
+    });
+  }
+
+  wrap.querySelector('#btn-decode').onclick = ()=>{
+    const raw = wrap.querySelector('#decode-input').value;
+    const decoded = decodeData(raw);
+    const err = wrap.querySelector('#decode-err');
+    if(!decoded || !decoded.answers){ err.style.display='block'; err.innerText = 'Could not read that code — check it was copied in full.'; return; }
+    goto('admin-submission-detail', { decodedSubmission: decoded });
+  };
+
+  return wrap;
+}
+
+/* ================= ADMIN: EDITOR ================= */
+function blankQuestion(type){
+  const base = { id: uid(), type, text:'' };
+  if(type==='mcq') return {...base, options:['','','',''], correctIndex:0 };
+  if(type==='coding') return {...base, language:'', starter:'' };
+  return base;
+}
+
+function saveAssessment(a){
+  const assessments = lsGet(LS_ASSESSMENTS, {});
+  assessments[a.id] = a;
+  lsSet(LS_ASSESSMENTS, assessments);
+  const order = lsGet(LS_ASSESSMENT_ORDER, []);
+  if(!order.includes(a.id)){ order.push(a.id); lsSet(LS_ASSESSMENT_ORDER, order); }
+}
+
+function renderAdminEditor(){
+  const wrap = document.createElement('div');
+  wrap.className = 'wrap';
+  const a = state.currentAssessment;
+
+  function paint(){
+    const encoded = encodeData(a);
+    const link = encoded ? (window.location.origin + window.location.pathname + '?a=' + encoded) : null;
+    wrap.innerHTML = `
+      <div class="row-between" style="margin-bottom:18px;">
+        <h1 class="page-title" style="margin:0;">${a.title ? esc(a.title) : 'New assessment'}</h1>
+        <div class="row">
+          <button class="btn btn-sm" id="btn-view-subs">Submissions</button>
+          <button class="btn btn-primary btn-sm" id="btn-save">Save assessment</button>
+        </div>
+      </div>
+
+      <div class="share-box">
+        <div class="label">Shareable link</div>
+        <div class="share-link">${link ? esc(link) : 'Add at least one question to generate a link.'}</div>
+        <div class="share-actions">
+          <button class="btn btn-sm" id="btn-copy-link" ${link?'':'disabled'}>Copy link</button>
+          <button class="btn btn-sm" id="btn-copy-code" ${encoded?'':'disabled'}>Copy raw code</button>
+        </div>
+        <div class="hint">If the link ever gets mangled by a chat app, send the raw code instead — the candidate can paste it in on the entry screen.</div>
+      </div>
+
+      <div class="card">
+        <div class="field"><label>Title</label>
+          <input type="text" id="f-title" value="${esc(a.title)}" placeholder="e.g. Senior Data Engineer — Technical Screen"></div>
+        <div class="field"><label>Description for candidate (optional)</label>
+          <textarea id="f-desc" placeholder="Any context or instructions the candidate should see before starting.">${esc(a.description)}</textarea></div>
+        <div class="field" style="max-width:220px;"><label>Time limit (minutes, 0 = none)</label>
+          <input type="number" id="f-duration" min="0" value="${a.durationMinutes||0}"></div>
+      </div>
+
+      <div class="card">
+        <div class="eyebrow">Questions (${a.questions.length})</div>
+        <div id="qlist"></div>
+        <div class="add-q-row">
+          <button class="btn btn-sm" id="add-mcq">+ Multiple choice</button>
+          <button class="btn btn-sm" id="add-text">+ Written answer</button>
+          <button class="btn btn-sm" id="add-coding">+ Coding question</button>
+        </div>
+      </div>
+    `;
+
+    const qlist = wrap.querySelector('#qlist');
+    if(a.questions.length===0){ qlist.innerHTML = `<div class="empty-state">No questions yet — add one below.</div>`; }
+    else { a.questions.forEach((q, idx)=> qlist.appendChild(renderQuestionEditor(q, idx, a, paint))); }
+
+    wrap.querySelector('#f-title').oninput = (e)=> a.title = e.target.value;
+    wrap.querySelector('#f-desc').oninput = (e)=> a.description = e.target.value;
+    wrap.querySelector('#f-duration').oninput = (e)=> a.durationMinutes = parseInt(e.target.value||'0',10);
+    wrap.querySelector('#add-mcq').onclick = ()=>{ a.questions.push(blankQuestion('mcq')); paint(); };
+    wrap.querySelector('#add-text').onclick = ()=>{ a.questions.push(blankQuestion('text')); paint(); };
+    wrap.querySelector('#add-coding').onclick = ()=>{ a.questions.push(blankQuestion('coding')); paint(); };
+
+    const copyLinkBtn = wrap.querySelector('#btn-copy-link');
+    if(copyLinkBtn) copyLinkBtn.onclick = ()=>{ navigator.clipboard.writeText(link).then(()=>showToast('Link copied')).catch(()=>showToast('Copy failed — select the text manually')); };
+    const copyCodeBtn = wrap.querySelector('#btn-copy-code');
+    if(copyCodeBtn) copyCodeBtn.onclick = ()=>{ navigator.clipboard.writeText(encoded).then(()=>showToast('Code copied')).catch(()=>showToast('Copy failed — select the text manually')); };
+
+    wrap.querySelector('#btn-view-subs').onclick = ()=> goto('admin-submissions', { currentAssessment:a });
+    wrap.querySelector('#btn-save').onclick = ()=>{
+      if(!a.title.trim()){ showToast('Add a title first'); return; }
+      saveAssessment(a);
+      showToast('Saved to this browser');
+      paint();
+    };
+  }
+
+  function renderQuestionEditor(q, idx, a, repaint){
+    const card = document.createElement('div');
+    card.className = 'qcard';
+    const badgeClass = q.type==='mcq' ? 'qtype-mcq' : q.type==='coding' ? 'qtype-coding' : 'qtype-text';
+    const badgeLabel = q.type==='mcq' ? 'Multiple choice' : q.type==='coding' ? 'Coding' : 'Written answer';
+    card.innerHTML = `
+      <div class="qhead">
+        <span class="qtype-badge ${badgeClass}">${badgeLabel} · Q${idx+1}</span>
+        <button class="btn btn-ghost btn-sm" data-del>Remove</button>
+      </div>
+      <div class="field" style="margin-bottom:10px;">
+        <textarea data-qtext placeholder="Question text…" style="min-height:54px;">${esc(q.text)}</textarea>
+      </div>
+      <div data-extra></div>
+    `;
+    card.querySelector('[data-del]').onclick = ()=>{ a.questions.splice(idx,1); repaint(); };
+    card.querySelector('[data-qtext]').oninput = (e)=> q.text = e.target.value;
+
+    const extra = card.querySelector('[data-extra]');
+    if(q.type==='mcq'){
+      q.options.forEach((opt,oi)=>{
+        const row = document.createElement('div');
+        row.className = 'opt-row';
+        row.innerHTML = `<input type="radio" name="correct-${q.id}" ${q.correctIndex===oi?'checked':''}>
+          <input type="text" value="${esc(opt)}" placeholder="Option ${oi+1}">`;
+        row.querySelector('input[type=radio]').onchange = ()=> q.correctIndex = oi;
+        row.querySelector('input[type=text]').oninput = (e)=> q.options[oi] = e.target.value;
+        extra.appendChild(row);
+      });
+      const hint = document.createElement('div');
+      hint.className = 'hint'; hint.innerText = 'Select the radio button next to the correct option.';
+      extra.appendChild(hint);
+    } else if(q.type==='coding'){
+      extra.innerHTML = `
+        <div class="field" style="max-width:260px;"><label>Language / stack (optional)</label>
+          <input type="text" data-lang value="${esc(q.language||'')}" placeholder="e.g. Python, SQL, any"></div>
+        <div class="field"><label>Starter code shown to candidate (optional)</label>
+          <textarea data-starter style="font-family:var(--mono);min-height:80px;">${esc(q.starter||'')}</textarea></div>
+      `;
+      extra.querySelector('[data-lang]').oninput = (e)=> q.language = e.target.value;
+      extra.querySelector('[data-starter]').oninput = (e)=> q.starter = e.target.value;
+    }
+    return card;
+  }
+
+  paint();
+  return wrap;
+}
+
+/* ================= ADMIN: SAVED SUBMISSIONS LIST ================= */
+function renderAdminSubmissionsList(){
+  const wrap = document.createElement('div');
+  wrap.className = 'wrap';
+  const a = state.currentAssessment;
+  const subs = lsGet(subKey(a.id), []);
+
+  wrap.innerHTML = `
+    <button class="btn btn-ghost btn-sm" id="btn-back" style="margin-bottom:14px;">← Back</button>
+    <h1 class="page-title" style="margin-bottom:2px;">${esc(a.title)}</h1>
+    <p class="page-sub">${subs.length} saved submission${subs.length===1?'':'s'} in this browser</p>
+    <div class="card">
+      <div class="eyebrow">Decode a new submission</div>
+      <div class="decode-box"><textarea id="decode-input" placeholder="Paste result code here…"></textarea></div>
+      <button class="btn btn-sm" id="btn-decode" style="margin-top:10px;">Decode</button>
+      <div id="decode-err" class="hint" style="color:var(--danger);display:none;margin-top:8px;"></div>
+    </div>
+    <div id="list" style="margin-top:14px;"></div>
+  `;
+  wrap.querySelector('#btn-back').onclick = ()=> goto('admin-editor', { currentAssessment:a });
+  wrap.querySelector('#btn-decode').onclick = ()=>{
+    const raw = wrap.querySelector('#decode-input').value;
+    const decoded = decodeData(raw);
+    const err = wrap.querySelector('#decode-err');
+    if(!decoded || !decoded.answers){ err.style.display='block'; err.innerText = 'Could not read that code — check it was copied in full.'; return; }
+    goto('admin-submission-detail', { decodedSubmission: decoded });
+  };
+
+  const listEl = wrap.querySelector('#list');
+  if(subs.length===0){
+    listEl.innerHTML = `<div class="empty-state">Nothing saved yet — decode a submission above and you'll be able to save it here.</div>`;
+  } else {
+    subs.slice().reverse().forEach(s=>{
+      const row = document.createElement('div');
+      row.className = 'assessment-row';
+      row.innerHTML = `
+        <div>
+          <div style="font-weight:600;margin-bottom:4px;">${esc(s.candidateName||'Unnamed candidate')}</div>
+          <div style="color:var(--muted);font-size:12.5px;">${esc(s.candidateEmail||'')}${s.candidateEmail?' · ':''}submitted ${fmtDate(s.submittedAt)}</div>
+        </div>
+        <div class="row">
+          ${s.mcqTotal>0 ? `<span class="score-pill ${s.mcqScore/s.mcqTotal>=0.6?'score-good':'score-bad'}">${s.mcqScore}/${s.mcqTotal} MCQ</span>` : ''}
+          <span class="hint" style="margin:0;">${(s.logs||[]).length} log entries</span>
+        </div>
+      `;
+      row.onclick = ()=> goto('admin-submission-detail', { decodedSubmission:s });
+      listEl.appendChild(row);
+    });
+  }
+  return wrap;
+}
+
+/* ================= SUBMISSION DETAIL (shared by decode-from-dashboard and saved list) ================= */
+function renderSubmissionDetail(s, allowSave){
+  const wrap = document.createElement('div');
+  wrap.className = 'wrap';
+  if(!s){ wrap.innerHTML = `<div class="center-note">No submission loaded.</div>`; return wrap; }
+  const a = s.assessment || { title:'Assessment', questions:[] };
+
+  wrap.innerHTML = `
+    <button class="btn btn-ghost btn-sm" id="btn-back" style="margin-bottom:14px;">← Back</button>
+    <h1 class="page-title" style="margin-bottom:2px;">${esc(s.candidateName||'Unnamed candidate')}</h1>
+    <p class="page-sub">${esc(s.candidateEmail||'')} · ${esc(a.title)} · submitted ${fmtDate(s.submittedAt)}</p>
+    <div class="card"><div class="eyebrow">Answers</div><div id="answers"></div></div>
+    <div class="card"><div class="eyebrow">Activity log (${(s.logs||[]).length} entries)</div><div id="logs"></div></div>
+    ${allowSave ? `<button class="btn btn-primary btn-sm" id="btn-save-sub" style="margin-top:14px;">Save to this assessment's list</button>` : ''}
+  `;
+  wrap.querySelector('#btn-back').onclick = ()=> goto('admin-dashboard');
+
+  const answersEl = wrap.querySelector('#answers');
+  (a.questions||[]).forEach((q,idx)=>{
+    const ans = (s.answers||{})[q.id];
+    const block = document.createElement('div');
+    block.className = 'answer-block';
+    let answerHtml = '';
+    if(q.type==='mcq'){
+      const chosen = (ans!==undefined && ans!==null) ? q.options[ans] : null;
+      const correct = q.options[q.correctIndex];
+      const isCorrect = ans === q.correctIndex;
+      answerHtml = `<div class="ans" style="font-family:var(--sans);">Answered: <strong>${chosen?esc(chosen):'— not answered —'}</strong>
+        ${isCorrect ? '<span class="score-pill score-good" style="margin-left:8px;">Correct</span>' : `<span class="score-pill score-bad" style="margin-left:8px;">Correct: ${esc(correct)}</span>`}</div>`;
+    } else {
+      answerHtml = `<div class="ans">${ans ? esc(ans) : '— not answered —'}</div>`;
+    }
+    block.innerHTML = `<div class="qtext">Q${idx+1}. ${esc(q.text)}</div>${answerHtml}`;
+    answersEl.appendChild(block);
+  });
+
+  const logsEl = wrap.querySelector('#logs');
+  const logs = s.logs || [];
+  if(logs.length===0){ logsEl.innerHTML = `<div class="hint">No flagged activity recorded during this attempt.</div>`; }
+  else {
+    logs.forEach(l=>{
+      const line = document.createElement('div');
+      line.className = 'log-line';
+      line.innerHTML = `<span class="t">${fmtTime(l.ts)}</span><span class="flag">${esc(l.type)}</span><span>${esc(l.detail||'')}</span>`;
+      logsEl.appendChild(line);
+    });
+  }
+
+  const saveBtn = wrap.querySelector('#btn-save-sub');
+  if(saveBtn){
+    saveBtn.onclick = ()=>{
+      if(!a.id){ showToast('Nothing to save — this code has no assessment id.'); return; }
+      const list = lsGet(subKey(a.id), []);
+      if(!list.find(x=>x.submittedAt===s.submittedAt && x.candidateName===s.candidateName)) list.push(s);
+      lsSet(subKey(a.id), list);
+      const assessments = lsGet(LS_ASSESSMENTS, {});
+      if(!assessments[a.id]){ assessments[a.id]=a; lsSet(LS_ASSESSMENTS, assessments); const order=lsGet(LS_ASSESSMENT_ORDER,[]); if(!order.includes(a.id)){order.push(a.id);lsSet(LS_ASSESSMENT_ORDER,order);} }
+      showToast('Saved');
+    };
+  }
+  return wrap;
+}
+
+/* ================= CANDIDATE: ENTRY ================= */
+function renderCandidateEntry(){
+  const wrap = document.createElement('div');
+  wrap.className = 'wrap wrap-narrow';
+  const a = state.currentAssessment;
+
+  if(!a){
+    wrap.innerHTML = `
+      <h1 class="page-title">Enter your assessment code</h1>
+      <p class="page-sub">Paste the code your interviewer sent you.</p>
+      <div class="card">
+        <div class="decode-box"><textarea id="code-input" placeholder="Paste code here…"></textarea></div>
+        <div id="err" class="hint" style="color:var(--danger);display:none;margin:8px 0;"></div>
+        <button class="btn btn-primary" id="btn-load" style="margin-top:10px;">Continue</button>
+      </div>
+    `;
+    wrap.querySelector('#btn-load').onclick = ()=>{
+      const raw = wrap.querySelector('#code-input').value;
+      const decoded = decodeData(raw);
+      const err = wrap.querySelector('#err');
+      if(!decoded || !decoded.questions || decoded.questions.length===0){ err.style.display='block'; err.innerText='Could not read that code — check it was copied in full.'; return; }
+      goto('candidate-entry', { currentAssessment: decoded });
+    };
+    return wrap;
+  }
+
+  wrap.innerHTML = `
+    <h1 class="page-title">${esc(a.title || 'Assessment')}</h1>
+    ${a.description ? `<p class="page-sub">${esc(a.description)}</p>` : `<p class="page-sub">Enter your details to begin.</p>`}
+    <div class="card">
+      <div class="field"><label>Your name</label><input type="text" id="f-name" placeholder="Full name"></div>
+      <div class="field"><label>Email (optional)</label><input type="email" id="f-email" placeholder="you@example.com"></div>
+      <div id="err" class="hint" style="color:var(--danger);display:none;margin-bottom:10px;"></div>
+      <button class="btn btn-primary" id="btn-start">Begin assessment</button>
+    </div>
+    <p class="hint">This assessment records tab switches, copy/paste, and right-clicks with a timestamp. Nothing is blocked — it's kept as a record for the interviewer.</p>
+  `;
+  const err = wrap.querySelector('#err');
+  wrap.querySelector('#btn-start').onclick = ()=>{
+    const name = wrap.querySelector('#f-name').value.trim();
+    const email = wrap.querySelector('#f-email').value.trim();
+    if(!name){ err.style.display='block'; err.innerText='Enter your name to continue.'; return; }
+    state.candidate = { name, email };
+    startExam(a);
+  };
+  return wrap;
+}
+
+/* ================= CANDIDATE: EXAM ================= */
+function startExam(assessment){
+  const now = Date.now();
+  state.exam = {
+    assessment, index:0, answers:{}, logs:[],
+    startTs: now,
+    deadline: assessment.durationMinutes>0 ? now + assessment.durationMinutes*60000 : null,
+    timerHandle: null
+  };
+  goto('candidate-exam');
+  attachIntegrityListeners();
+}
+
+function pushLog(type, detail){
+  if(!state.exam) return;
+  state.exam.logs.push({ ts: Date.now(), type, detail: detail||'' });
+  renderTicker();
+}
+
+let listenersAttached = false;
+function attachIntegrityListeners(){
+  if(listenersAttached) return;
+  listenersAttached = true;
+  document.addEventListener('visibilitychange', ()=>{ if(state.view==='candidate-exam') pushLog(document.hidden?'tab-hidden':'tab-visible', document.hidden?'Switched away from the exam tab':'Returned to the exam tab'); });
+  window.addEventListener('blur', ()=>{ if(state.view==='candidate-exam') pushLog('window-blur','Window lost focus'); });
+  window.addEventListener('focus', ()=>{ if(state.view==='candidate-exam') pushLog('window-focus','Window regained focus'); });
+  document.addEventListener('copy', ()=>{ if(state.view==='candidate-exam') pushLog('copy','Text copied from the page'); });
+  document.addEventListener('cut', ()=>{ if(state.view==='candidate-exam') pushLog('cut','Text cut from the page'); });
+  document.addEventListener('paste', ()=>{ if(state.view==='candidate-exam') pushLog('paste','Content pasted into an answer'); });
+  document.addEventListener('contextmenu', ()=>{ if(state.view==='candidate-exam') pushLog('right-click','Right-click / context menu opened'); });
+}
+
+function renderCandidateExam(){
+  const ex = state.exam;
+  const shell = document.createElement('div');
+  shell.className = 'exam-shell';
+  if(!ex){ shell.innerHTML = `<div class="center-note">No active exam.</div>`; return shell; }
+  const a = ex.assessment;
+  const q = a.questions[ex.index];
+
+  const header = document.createElement('div');
+  header.className = 'exam-header';
+  header.innerHTML = `
+    <div class="exam-title">${esc(a.title)}</div>
+    <div class="row" style="gap:16px;">
+      <div class="exam-progress">Question ${ex.index+1} of ${a.questions.length}</div>
+      ${ex.deadline ? `<div class="timer" id="timer">--:--</div>` : ''}
+    </div>
+  `;
+  shell.appendChild(header);
+
+  const body = document.createElement('div');
+  body.className = 'exam-body';
+
+  const nav = document.createElement('div');
+  nav.className = 'qnav';
+  a.questions.forEach((qq,i)=>{
+    const dot = document.createElement('div');
+    const answered = ex.answers[qq.id]!==undefined && ex.answers[qq.id]!==null && ex.answers[qq.id]!=='';
+    dot.className = 'qnav-dot' + (i===ex.index?' active':'') + (answered?' answered':'');
+    dot.innerText = i+1;
+    dot.onclick = ()=>{ ex.index = i; render(); };
+    nav.appendChild(dot);
+  });
+  body.appendChild(nav);
+
+  const qText = document.createElement('div');
+  qText.className = 'q-text';
+  qText.innerText = q.text || '(no question text)';
+  body.appendChild(qText);
+
+  if(q.type==='mcq'){
+    q.options.forEach((opt, oi)=>{
+      const optEl = document.createElement('div');
+      optEl.className = 'mcq-opt' + (ex.answers[q.id]===oi ? ' selected' : '');
+      optEl.innerHTML = `<input type="radio" name="mcq-${q.id}" ${ex.answers[q.id]===oi?'checked':''}> <span>${esc(opt||'(empty option)')}</span>`;
+      optEl.onclick = ()=>{ ex.answers[q.id] = oi; render(); };
+      body.appendChild(optEl);
+    });
+  } else if(q.type==='coding'){
+    if(q.language){ const lang=document.createElement('div'); lang.className='hint'; lang.style.marginBottom='8px'; lang.innerText='Language / stack: '+q.language; body.appendChild(lang); }
+    const ta = document.createElement('textarea');
+    ta.className = 'code-editor'; ta.spellcheck = false;
+    ta.value = ex.answers[q.id] !== undefined ? ex.answers[q.id] : (q.starter || '');
+    ta.oninput = (e)=>{ ex.answers[q.id] = e.target.value; };
+    body.appendChild(ta);
+  } else {
+    const ta = document.createElement('textarea');
+    ta.className = 'code-editor essay-editor';
+    ta.style.fontFamily = 'var(--sans)'; ta.style.color = 'var(--text)';
+    ta.value = ex.answers[q.id] || '';
+    ta.oninput = (e)=>{ ex.answers[q.id] = e.target.value; };
+    body.appendChild(ta);
+  }
+
+  const navBtns = document.createElement('div');
+  navBtns.className = 'exam-nav-buttons';
+  const prevBtn = document.createElement('button');
+  prevBtn.className = 'btn'; prevBtn.innerText = '← Previous'; prevBtn.disabled = ex.index===0;
+  prevBtn.onclick = ()=>{ ex.index--; render(); };
+  navBtns.appendChild(prevBtn);
+
+  if(ex.index < a.questions.length-1){
+    const nextBtn = document.createElement('button');
+    nextBtn.className = 'btn btn-primary'; nextBtn.innerText = 'Next →';
+    nextBtn.onclick = ()=>{ ex.index++; render(); };
+    navBtns.appendChild(nextBtn);
+  } else {
+    const submitBtn = document.createElement('button');
+    submitBtn.className = 'btn btn-amber'; submitBtn.innerText = 'Submit assessment';
+    submitBtn.onclick = ()=> submitExam();
+    navBtns.appendChild(submitBtn);
+  }
+  body.appendChild(navBtns);
+  shell.appendChild(body);
+
+  const ticker = document.createElement('div');
+  ticker.className = 'ticker'; ticker.id = 'ticker';
+  shell.appendChild(ticker);
+
+  setTimeout(()=>{ renderTicker(); if(ex.deadline) startTimerTick(); }, 0);
+  return shell;
+}
+
+function renderTicker(){
+  const el = document.getElementById('ticker');
+  if(!el || !state.exam) return;
+  const logs = state.exam.logs.slice(-6).reverse();
+  el.innerHTML = `
+    <div class="rec-dot"></div>
+    <div class="ticker-label">Activity log</div>
+    <div class="ticker-scroll"><div class="ticker-entries">
+      ${logs.length===0 ? '<span>No activity recorded yet</span>' : logs.map(l=>`<span>${fmtTime(l.ts)} · <span class="flag">${esc(l.type)}</span></span>`).join('')}
+    </div></div>
+    <div class="ticker-count">${state.exam.logs.length} total</div>
+  `;
+}
+
+function startTimerTick(){
+  const ex = state.exam;
+  if(ex.timerHandle) clearInterval(ex.timerHandle);
+  const tick = ()=>{
+    const el = document.getElementById('timer');
+    if(!el || !state.exam){ clearInterval(ex.timerHandle); return; }
+    const remaining = ex.deadline - Date.now();
+    if(remaining<=0){ el.innerText='00:00'; clearInterval(ex.timerHandle); submitExam(); return; }
+    const mins = Math.floor(remaining/60000);
+    const secs = Math.floor((remaining%60000)/1000);
+    el.innerText = String(mins).padStart(2,'0')+':'+String(secs).padStart(2,'0');
+    if(remaining < 60000) el.classList.add('low');
+  };
+  tick();
+  ex.timerHandle = setInterval(tick, 1000);
+}
+
+async function submitExam(){
+  const ex = state.exam;
+  if(!ex) return;
+  if(ex.timerHandle) clearInterval(ex.timerHandle);
+  const a = ex.assessment;
+
+  let mcqScore = 0, mcqTotal = 0;
+  a.questions.forEach(q=>{ if(q.type==='mcq'){ mcqTotal++; if(ex.answers[q.id]===q.correctIndex) mcqScore++; } });
+
+  const submission = {
+    assessment: a,
+    candidateName: state.candidate.name,
+    candidateEmail: state.candidate.email,
+    answers: ex.answers,
+    logs: ex.logs,
+    startedAt: ex.startTs,
+    submittedAt: Date.now(),
+    mcqScore, mcqTotal
+  };
+
+  const code = encodeData(submission);
+  state.exam = null;
+  goto('candidate-submitted', { resultCode: code });
+}
+
+/* ================= CANDIDATE: SUBMITTED ================= */
+function renderCandidateSubmitted(){
+  const wrap = document.createElement('div');
+  wrap.className = 'wrap wrap-narrow';
+  const code = state.resultCode || '';
+  wrap.innerHTML = `
+    <div style="text-align:center;">
+      <div style="font-family:var(--mono);font-size:40px;color:var(--good);margin-bottom:14px;">✓</div>
+      <h1 class="page-title" style="margin-bottom:8px;">Submitted</h1>
+      <p class="page-sub" style="max-width:460px;margin:0 auto 24px;">Thanks, ${esc(state.candidate.name||'')}. Send the code below back to your interviewer — by email, chat, whatever's easiest — so they can read your answers.</p>
+    </div>
+    <div class="result-code">${esc(code)}</div>
+    <div class="row" style="justify-content:center;gap:10px;flex-wrap:wrap;">
+      <button class="btn btn-primary" id="btn-copy">Copy result code</button>
+      <button class="btn" id="btn-download">Download as file</button>
+    </div>
+  `;
+  wrap.querySelector('#btn-copy').onclick = ()=>{ navigator.clipboard.writeText(code).then(()=>showToast('Copied')).catch(()=>showToast('Copy failed — select the text manually')); };
+  wrap.querySelector('#btn-download').onclick = ()=>{
+    const blob = new Blob([code], {type:'text/plain'});
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url; link.download = 'assessment-result-'+(state.candidate.name||'candidate').replace(/\s+/g,'-')+'.txt';
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+  return wrap;
+}
+
+render();
+</script>
+</body>
+</html>
